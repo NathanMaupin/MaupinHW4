@@ -1,0 +1,90 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Nov 12 18:10:43 2021
+
+@author: Nathan Maupin
+"""
+
+# 1.  Numerical Differentiation (20 pts) Code.
+
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+import pandas as pd
+
+
+h = 1e-8
+f_array = []
+E = []
+N = np.arange(0, 4, 0.04)
+
+def f(x): 
+    return math.sin(x)
+
+def fprime(x):
+    return math.cos(x)
+
+def fiveend(x):
+    return 1/(12*h)*(-25*f(x) + 48*f((x+h)) - 36*f(x+2*h) + 16*f(x+3*h) - 3*f(x+4*h)) 
+
+def fivemid(x):
+    return 1/(12*h)*(f(x-2*h)-8*f(x-h)+8*f(x+h)-f(x+2*h))   
+
+#print("***Problem 1***")
+for count, n in enumerate(N):
+    # if statements check for which 5-point has less absolute error
+    if abs(fprime(n)-fivemid(n)) < abs(fprime(n)-fiveend(n)):
+
+        E.append(abs(fprime(n)-fivemid(n)))
+    else:
+
+        E.append(abs(fprime(n)-fiveend(n)))
+        
+plt.plot(N, E)
+plt.title("Problem 1 Absolute Error")
+plt.show()
+
+
+
+h = math.pi/8
+E_forward = []
+E_center = []
+E_backward = []
+
+
+# Part a
+def f(x):
+    return x + math.sin(x)
+
+def fprime(x):
+    return -1*math.sin(x)
+
+def backward32(x):
+    return 1/h**2*(f(x-2*h) - 2*f(x-h) + f(x))
+
+def center32(x):
+    return 1/h**2*(f(x-h) - 2*f(x) + f(x+h))
+
+def forward32(x):
+    return 1/h**2*(f(x) - 2*f(x+h) + f(x+2*h))
+
+setup = {"derivative": ["f'' exact", "f'' forward", "f'' centered", "f'' backward"],
+         "values": [str(fprime(1)), str(forward32(1)), str(center32(1)), 
+                    backward32(1)]}
+table = pd.DataFrame(setup, columns = ['derivative', 'values'])
+print("***Problem 4***")
+print(table)
+
+# Part b
+N = np.arange(-0.5, 0.5, 0.001)
+for count, n in enumerate(N):
+    E_forward.append(abs(fprime(n)-forward32(n)))
+    E_center.append(abs(fprime(n)-center32(n)))
+    E_backward.append(abs(fprime(n)-backward32(n)))
+   
+plt.plot(N, E_forward, label="Forward")
+plt.plot(N, E_center, label="Center")
+plt.plot(N, E_backward, label="backward")
+plt.title("Problem 4 Absolute Error")
+plt.legend()
+plt.show()
